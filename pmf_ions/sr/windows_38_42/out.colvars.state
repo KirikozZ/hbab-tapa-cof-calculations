@@ -1,0 +1,21 @@
+configuration {
+  step     50000407
+  dt 1.000000e+00
+  version 2025-08-27
+}
+
+colvar {
+  name Translocation
+  x       42.285212904842
+}
+
+restraint {
+  configuration {
+    step 50000407
+    name harmonic1
+firstStep          407
+stage            5
+centers   4.20000000000000e+01
+  }
+}
+

@@ -1,0 +1,21 @@
+#.\wham.exe 38 57 100 0.0001 300 0 input.dat lacl3.pmf 5 1234
+out01.colvars.traj	38	6
+out02.colvars.traj	39	6
+out03.colvars.traj	40	6
+out04.colvars.traj	41	6
+out05.colvars.traj	42	6
+out06.colvars.traj	43	6
+out07.colvars.traj	44	6
+out08.colvars.traj	45	6
+out09.colvars.traj	46	6
+out10.colvars.traj	47	6
+out11.colvars.traj	48	6
+out12.colvars.traj	49	6
+out13.colvars.traj	50	6
+out14.colvars.traj	51	6
+out15.colvars.traj	52	6
+out16.colvars.traj	53	6
+out17.colvars.traj	54	6
+out18.colvars.traj	55	6
+out19.colvars.traj	56	6
+out20.colvars.traj	57	6
