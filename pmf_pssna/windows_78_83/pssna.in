@@ -67,7 +67,7 @@ fix               9 na nvt temp 300.0 300.0 100.0
 fix               10 HBAB nvt temp 300.0 300.0 100.0
 fix               11 br nvt temp 300.0 300.0 100.0
 
-fix               12 all colvars mix.colvars
+fix               12 all colvars pssna.colvars
 
 compute           cpull pull com
 variable          zcpull equal c_cpull[3]

@@ -40,21 +40,21 @@ The effective harmonic force constant is 6 kcal mol⁻¹ Å⁻². The Colvars in
 | PSSNa | 30–83 | 54 | 5 ns | 1 ns | 4 ns |
 | Cs, Sr, and La, each | 38–57 | 20 | 10 ns | 2 ns | 8 ns |
 
-The `windows_*` directories group successive sampling windows. Each HBAB or PSSNa segment samples six centers over 30 ns; each ion segment samples five centers over 50 ns. The staged harmonic restraints are defined in `mix.colvars`.
+The `windows_*` directories group successive sampling windows. Each HBAB or PSSNa segment samples six centers over 30 ns; each ion segment samples five centers over 50 ns. The staged harmonic restraints are defined in the system-specific `.colvars` file.
 
 Reaction-coordinate data are recorded every 100 MD steps. The `divide/divide.f90` programs exclude the initial equilibration records and extract window-specific trajectories, with filenames defined in `divide/window_files.txt`. The `his/his.f90` programs calculate window histograms. PMFs are reconstructed using the weighted histogram analysis method (WHAM), with trajectory paths, restraint centers, and force constants specified in `wham/input.dat`.
 
 ### Calculation files
 
-| System directory | LAMMPS input | Structure and force-field data | PMF result |
-|---|---|---|---|
-| `pmf_hbab` | `hbab.in` | `hbab.data` | `wham/hbab.pmf` |
-| `pmf_pssna` | `pssna.in` | `pssna.data` | `wham/pssna.pmf` |
-| `pmf_ions/cs` | `cs.in` | `cs.data` | `wham/cscl.pmf` |
-| `pmf_ions/sr` | `sr.in` | `sr.data` | `wham/srcl2.pmf` |
-| `pmf_ions/la` | `la.in` | `la.data` | `wham/lacl3.pmf` |
+| System directory | LAMMPS input | Colvars configuration | Structure and force-field data | PMF result |
+|---|---|---|---|---|
+| `pmf_hbab` | `hbab.in` | `hbab.colvars` | `hbab.data` | `wham/hbab.pmf` |
+| `pmf_pssna` | `pssna.in` | `pssna.colvars` | `pssna.data` | `wham/pssna.pmf` |
+| `pmf_ions/cs` | `cs.in` | `cs.colvars` | `cs.data` | `wham/cscl.pmf` |
+| `pmf_ions/sr` | `sr.in` | `sr.colvars` | `sr.data` | `wham/srcl2.pmf` |
+| `pmf_ions/la` | `la.in` | `la.colvars` | `la.data` | `wham/lacl3.pmf` |
 
-LAMMPS inputs and data files are located in the corresponding `windows_*` directories. `out.colvars.traj` contains reaction-coordinate data, `log.lammps` contains simulation and thermodynamic output, and `restart.1` and `restart.2` are LAMMPS restart files.
+LAMMPS inputs, Colvars configurations, and data files are located in the corresponding `windows_*` directories. `out.colvars.traj` contains reaction-coordinate data, `log.lammps` contains simulation and thermodynamic output, and `restart.1` and `restart.2` are LAMMPS restart files.
 
 ## Electron density difference calculations
 

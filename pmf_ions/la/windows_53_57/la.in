@@ -48,7 +48,7 @@ unfix             freeze_min
 velocity          liquid create 300.0 1491119213 mom yes rot yes dist gaussian
 
 variable          n equal z[13481]
-fix               4 all colvars mix.colvars
+fix               4 all colvars la.colvars
 
 thermo            1000
 thermo_style      custom step cpu etotal temp v_n
