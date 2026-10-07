@@ -1,86 +1,90 @@
-# HBAB–TAPA–COF calculation details
+# HBAB–TAPA–COF simulation details
 
-Cleaned PMF and electron density difference (EDD) calculation files for HBAB–TAPA–COF.
+This repository contains molecular dynamics, potential of mean force (PMF), and electron density difference (EDD) calculations for HBAB, PSSNa, and ion interactions with HBAB–TAPA–COF.
 
-**Complete dataset:** [download the ZIP from Release v1.0.0](https://github.com/KirikozZ/hbab-tapa-cof-calculations/releases/tag/v1.0.0). The release includes a SHA-256 checksum file.
-
-**Browse the data:** the five calculation directories below contain the same 544 calculation files as the release archive. Large scientific files are tracked with Git LFS.
-
-Prepared: 2026-10-07. Updated: 2026-10-07. 当前包保留五类计算目录中的 544 个计算文件；源文件夹未修改。
-
-## Contents
+## Calculation datasets
 
 | Directory | Calculation |
 |---|---|
-| pmf_hbab | HBAB interfacial PMF |
-| pmf_pssna | PSSNa interfacial PMF; final PMF corresponds to the PSS3 worksheet previously checked |
-| pmf_ions | Cs, Sr and La ion PMF |
-| edd_cations_cof | Cs, Sr and La EDD; upstream reference COF optimization |
-| edd_anions_cof | Cl and SO4 EDD |
+| `pmf_hbab` | Interfacial PMF of HBAB |
+| `pmf_pssna` | Interfacial PMF of PSSNa |
+| `pmf_ions` | PMFs for Cs, Sr, and La |
+| `edd_cations_cof` | COF–Cs, COF–Sr, and COF–La EDD calculations; reference COF geometry optimization |
+| `edd_anions_cof` | COF–Cl and COF–SO4 EDD calculations |
 
-This ZIP follows the current edited package, omits the previously listed optional files, and additionally removes output.log and template.sh from all 30 PMF windows directories. Retained calculation data are approximately 4.959 GB before compression.
+## Quantum chemical calculations and parameterization
 
-## Naming and file integrity
+The initial periodic HBAB–TAPA–COF unit-cell geometry was optimized using CASTEP with the GGA-PBE functional. Atomic partial charges of the periodic framework were derived using the REPEAT method in CP2K.
 
-Directory and file names use lowercase ASCII and underscores. Sampling ranges use windows_<first>_<last>. EDD stages use 01_geometry_optimization and 02_density_calculation; density subcalculations use 01_complex, 02_cof and 03_ion. WHAM metadata INPUT is named input.dat; filename.txt is named window_files.txt.
+PSSNa partial charges were assigned using the RESP method. The electrostatic potential was calculated at the B3LYP/6-311G** level with an implicit aqueous solvent model and analyzed using Multiwfn.
 
-Input/script file references and CP2K project labels have been updated to the packaged names. Configuration files use LF line endings. Scientific parameters, coordinate values and raw numerical results are preserved. Original output-log contents retain their historical names and project labels. External CP2K library identifiers (BASIS_MOLOPT, BASIS_MOLOPT_UCL, POTENTIAL and dftd3.dat) retain their case and must be supplied by the running environment.
+## Molecular dynamics simulations
 
+Molecular dynamics simulations were performed using LAMMPS. The COF framework was described using the General Amber Force Field (GAFF), and water was represented by the SPC/E model. Water O–H bonds and H–O–H angles were constrained using SHAKE. Ion Lennard-Jones parameters were selected for compatibility with SPC/E water.
 
-## PMF workflow
+Cross Lennard-Jones interactions used Lorentz–Berthelot mixing rules. Lennard-Jones and real-space Coulombic interactions used a 10 Å cutoff. Long-range electrostatics were evaluated using PPPM with an accuracy setting of 10⁻⁴. The simulations used `real` units, a 1 fs time step, and a temperature of 300 K.
 
-Each PMF sampling directory uses system-specific LAMMPS filenames:
+The HBAB and PSSNa sampling inputs use Nosé–Hoover temperature control. The PSSNa input additionally applies a rigid-body Nosé–Hoover thermostat to PSS molecules. The ion sampling inputs use NVE integration with a Berendsen thermostat for the liquid group. Boundary conditions are periodic in all three directions, with fixed simulation-cell dimensions during sampling. Molecular dynamics trajectories were visualized and analyzed using VMD.
 
-| System | Input | Data |
-|---|---|---|
-| HBAB | hbab.in | hbab.data |
-| PSSNa | pssna.in | pssna.data |
-| Cs | cs.in | cs.data |
-| Sr | sr.in | sr.data |
-| La | la.in | la.data |
+## Umbrella sampling and PMF reconstruction
 
-The read_data command in every input points to its corresponding system data file. Run within a sampling directory, for example `lmp -in hbab.in` or `lmp -in cs.in`, using a suitable LAMMPS installation and launch options. The mix.colvars bias file remains referenced by the input. Each windows directory retains log.lammps; output.log and template.sh are omitted.
+Umbrella sampling was performed using the LAMMPS Colvars interface. The reaction coordinate is the z-position of the selected molecule or ion relative to a fixed reference at z = 0. Harmonic restraint centers are spaced by 1 Å (0.1 nm).
 
+The effective harmonic force constant is 6 kcal mol⁻¹ Å⁻². The Colvars inputs specify `forceConstant 0.06` and `width 0.1`; Colvars scales the force constant by the inverse square of the width, giving `0.06 / 0.1² = 6`. This convention is described in the [Colvars reference manual](https://colvars.github.io/master/colvars-refman-lammps.html).
 
-The WHAM directory retains every required window trajectory and input.dat. Use the actual WHAM command/version for the dataset, with input.dat in place of INPUT and the normalized PMF output filename. The command comment's historical bin count does not by itself establish the command that produced the current result.
+### Sampling parameters
 
-The divide/window_files.txt and divide/divide.f90 are retained. The duplicate divide/outNN.colvars.traj outputs are omitted; they can be regenerated from divide/out.colvars.traj. The his/out.colvars.traj and histogram source/output are retained. The merged root-level trajectory copies are omitted. Original trajectories for each sampling segment are retained.
+| System | Restraint centers (Å) | Number of windows | Simulation per window | Equilibration excluded per window | Sampling used per window |
+|---|---|---|---|---|---|
+| HBAB | 30–83 | 54 | 5 ns | 1 ns | 4 ns |
+| PSSNa | 30–83 | 54 | 5 ns | 1 ns | 4 ns |
+| Cs, Sr, and La, each | 38–57 | 20 | 10 ns | 2 ns | 8 ns |
 
-The optional local a.exe executables are omitted. For example, compile and run within each directory with `gfortran divide.f90 -o divide` followed by `./divide`, or `gfortran his.f90 -o his` followed by `./his`. Choose a suitable compiler and verify the analysis outputs. The existing WHAM binary is a Windows executable; running on another platform requires a compatible WHAM installation. Full atomic trajectories requested as equilibrium.lammpstrj are not present in the supplied folders; reaction-coordinate trajectories are not a replacement.
+The `windows_*` directories group successive sampling windows. Each HBAB or PSSNa segment samples six centers over 30 ns; each ion segment samples five centers over 50 ns. The staged harmonic restraints are defined in `mix.colvars`.
 
-## EDD workflow
+Reaction-coordinate data are recorded every 100 MD steps. The `divide/divide.f90` programs exclude the initial equilibration records and extract window-specific trajectories, with filenames defined in `divide/window_files.txt`. The `his/his.f90` programs calculate window histograms. PMFs are reconstructed using the weighted histogram analysis method (WHAM), with trajectory paths, restraint centers, and force constants specified in `wham/input.dat`.
 
-Each density task retains its input, output, structure where supplied, and one original electron-density CUBE. The 15 summary-level density copies are omitted. Final edd.cub files are retained. Use the task-level density paths below for subtraction/visualization; analysis/plotting scripts were not supplied in the source folders.
+### Calculation files
 
-| Former summary density path | Retained archive path |
-|---|---|
-| `EDD-cation--COF/Cs/2_energy/Cs.cub` | `edd_cations_cof/cs/02_density_calculation/03_ion/cs.cub` |
-| `EDD-cation--COF/Cs/2_energy/HBAB-TAPA-COF.cub` | `edd_cations_cof/cs/02_density_calculation/02_cof/hbab_tapa_cof.cub` |
-| `EDD-cation--COF/Cs/2_energy/HBAB-TAPA-COF_Cs.cub` | `edd_cations_cof/cs/02_density_calculation/01_complex/hbab_tapa_cof_cs.cub` |
-| `EDD-cation--COF/La/2_energy/HBAB-TAPA-COF.cub` | `edd_cations_cof/la/02_density_calculation/02_cof/hbab_tapa_cof.cub` |
-| `EDD-cation--COF/La/2_energy/HBAB-TAPA-COF_La.cub` | `edd_cations_cof/la/02_density_calculation/01_complex/hbab_tapa_cof_la.cub` |
-| `EDD-cation--COF/La/2_energy/La.cub` | `edd_cations_cof/la/02_density_calculation/03_ion/la.cub` |
-| `EDD-cation--COF/Sr/2_energy/HBAB-TAPA-COF.cub` | `edd_cations_cof/sr/02_density_calculation/02_cof/hbab_tapa_cof.cub` |
-| `EDD-cation--COF/Sr/2_energy/HBAB-TAPA-COF_Sr.cub` | `edd_cations_cof/sr/02_density_calculation/01_complex/hbab_tapa_cof_sr.cub` |
-| `EDD-cation--COF/Sr/2_energy/Sr.cub` | `edd_cations_cof/sr/02_density_calculation/03_ion/sr.cub` |
-| `EDD-anion--COF/Cl/2-energy/Cl.cub` | `edd_anions_cof/cl/02_density_calculation/03_ion/hbab_tapa_cof_2layer_cl_electron_density_1_0.cube` |
-| `EDD-anion--COF/Cl/2-energy/HBAB-TAPA-COF-2layer-Cl.cub` | `edd_anions_cof/cl/02_density_calculation/01_complex/hbab_tapa_cof_2layer_cl_electron_density_1_0.cube` |
-| `EDD-anion--COF/Cl/2-energy/HBAB-TAPA-COF-2layer.cub` | `edd_anions_cof/cl/02_density_calculation/02_cof/hbab_tapa_cof_2layer_cl_electron_density_1_0.cube` |
-| `EDD-anion--COF/SO4/2-energy/HBAB-TAPA-COF-2layer-SO4.cub` | `edd_anions_cof/so4/02_density_calculation/01_complex/hbab_tapa_cof_2layer_so4_electron_density_1_0.cube` |
-| `EDD-anion--COF/SO4/2-energy/HBAB-TAPA-COF-2layer.cub` | `edd_anions_cof/so4/02_density_calculation/02_cof/hbab_tapa_cof_2layer_so4_electron_density_1_0.cube` |
-| `EDD-anion--COF/SO4/2-energy/SO4.cub` | `edd_anions_cof/so4/02_density_calculation/03_ion/hbab_tapa_cof_2layer_so4_electron_density_1_0.cube` |
+| System directory | LAMMPS input | Structure and force-field data | PMF result |
+|---|---|---|---|
+| `pmf_hbab` | `hbab.in` | `hbab.data` | `wham/hbab.pmf` |
+| `pmf_pssna` | `pssna.in` | `pssna.data` | `wham/pssna.pmf` |
+| `pmf_ions/cs` | `cs.in` | `cs.data` | `wham/cscl.pmf` |
+| `pmf_ions/sr` | `sr.in` | `sr.data` | `wham/srcl2.pmf` |
+| `pmf_ions/la` | `la.in` | `la.data` | `wham/lacl3.pmf` |
 
-Wavefunction restart files, BFGS Hessians, local Fortran executables and the three Cl spin-density CUBEs are omitted as requested; they remain in the original source folders. PMF restart.1/restart.2 files are retained. This package has not been validated by rerunning the full simulations.
+LAMMPS inputs and data files are located in the corresponding `windows_*` directories. `out.colvars.traj` contains reaction-coordinate data, `log.lammps` contains simulation and thermodynamic output, and `restart.1` and `restart.2` are LAMMPS restart files.
 
-## Downloading this repository
+## Electron density difference calculations
 
-Install Git LFS, then clone and download the large data files:
+EDD calculations evaluate charge redistribution upon ion adsorption on HBAB–TAPA–COF. Geometry optimization and density calculations were performed using CP2K/Quickstep.
 
-```sh
-git lfs install
-git clone https://github.com/KirikozZ/hbab-tapa-cof-calculations.git
-cd hbab-tapa-cof-calculations
-git lfs pull
+### Geometry optimization
+
+The reference COF and cation–COF complexes were optimized using PBE-D3(BJ), DZVP-MOLOPT-SR-GTH basis sets, and GTH-PBE pseudopotentials, with a plane-wave cutoff of 400 Ry and an SCF threshold of 1 × 10⁻⁶. The Cl and SO4 complexes were optimized using the CP2K xTB method with the BFGS optimizer and an SCF threshold of 1 × 10⁻⁶.
+
+### Electron-density calculations
+
+Single-point electron-density calculations used the Gaussian and plane waves (GPW) formalism, the PBE functional, DFT-D3(BJ) dispersion correction, DZVP-MOLOPT-SR-GTH basis sets, and GTH-PBE pseudopotentials. The plane-wave cutoff was 350 Ry and the SCF threshold was 5 × 10⁻⁶.
+
+Electrostatics used XY periodicity and the Martyna–Tuckerman Poisson solver. Total charge and spin multiplicity are specified in each input. For each ion–COF system, the complex, COF component, and ion component were evaluated in the same simulation cell and on the same real-space grid. Component coordinates correspond to those in the optimized complex.
+
+The electron density difference is defined as:
+
+```text
+Delta rho(r) = rho_complex(r) - rho_cof(r) - rho_ion(r)
 ```
 
-Alternatively, download the complete ZIP and checksum from [Release v1.0.0](https://github.com/KirikozZ/hbab-tapa-cof-calculations/releases/tag/v1.0.0); Git LFS is not required to use that ZIP. SHA256SUMS.txt contains checksums for the 544 calculation files in the repository.
+The electron-density CUBE files were processed using Multiwfn. Electron accumulation and depletion are displayed using different colors; the Cs, Sr, and La EDD isosurfaces use the same isovalue.
+
+### Calculation structure
+
+| Directory within each ion–COF system | Calculation |
+|---|---|
+| `01_geometry_optimization` | Optimization of the ion–COF complex |
+| `02_density_calculation/01_complex` | Electron density of the ion–COF complex |
+| `02_density_calculation/02_cof` | Electron density of the COF component |
+| `02_density_calculation/03_ion` | Electron density of the ion component |
+
+The reference COF optimization is located in `edd_cations_cof/cof_reference`. Component electron densities are stored as `.cub` or `.cube` files in the corresponding density-calculation subdirectories. The EDD result for each system is `02_density_calculation/edd.cub`.
