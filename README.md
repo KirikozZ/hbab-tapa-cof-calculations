@@ -18,14 +18,6 @@ The initial periodic HBAB–TAPA–COF unit-cell geometry was optimized using CA
 
 PSSNa partial charges were assigned using the RESP method. The electrostatic potential was calculated at the B3LYP/6-311G** level with an implicit aqueous solvent model and analyzed using Multiwfn.
 
-## Molecular dynamics simulations
-
-Molecular dynamics simulations were performed using LAMMPS. The COF framework was described using the General Amber Force Field (GAFF), and water was represented by the SPC/E model. Water O–H bonds and H–O–H angles were constrained using SHAKE. Ion Lennard-Jones parameters were selected for compatibility with SPC/E water.
-
-Cross Lennard-Jones interactions used Lorentz–Berthelot mixing rules. Lennard-Jones and real-space Coulombic interactions used a 10 Å cutoff. Long-range electrostatics were evaluated using PPPM with an accuracy setting of 10⁻⁴. The simulations used `real` units, a 1 fs time step, and a temperature of 300 K.
-
-The HBAB and PSSNa sampling inputs use Nosé–Hoover temperature control. The PSSNa input additionally applies a rigid-body Nosé–Hoover thermostat to PSS molecules. The ion sampling inputs use NVE integration with a Berendsen thermostat for the liquid group. Boundary conditions are periodic in all three directions, with fixed simulation-cell dimensions during sampling. Molecular dynamics trajectories were visualized and analyzed using VMD.
-
 ## Umbrella sampling and PMF reconstruction
 
 Umbrella sampling was performed using the LAMMPS Colvars interface. The reaction coordinate is the z-position of the selected molecule or ion relative to a fixed reference at z = 0. Harmonic restraint centers are spaced by 1 Å (0.1 nm).
@@ -58,7 +50,7 @@ LAMMPS inputs, Colvars configurations, and data files are located in the corresp
 
 ## Electron density difference calculations
 
-EDD calculations evaluate charge redistribution upon ion adsorption on HBAB–TAPA–COF. Geometry optimization and density calculations were performed using CP2K/Quickstep.
+EDD calculations evaluate charge redistribution upon combined system containing the ion and HBAB–TAPA–COF. Geometry optimization and density calculations were performed using CP2K/Quickstep.
 
 ### Geometry optimization
 
@@ -76,7 +68,7 @@ The electron density difference is defined as:
 Delta rho(r) = rho_complex(r) - rho_cof(r) - rho_ion(r)
 ```
 
-The electron-density CUBE files were processed using Multiwfn. Electron accumulation and depletion are displayed using different colors; the Cs, Sr, and La EDD isosurfaces use the same isovalue.
+The electron-density CUBE files were processed using Multiwfn. Electron accumulation and depletion are displayed using different colors; the Cs, Sr.
 
 ### Calculation structure
 
