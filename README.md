@@ -12,12 +12,6 @@ This repository contains molecular dynamics, potential of mean force (PMF), and 
 | `edd_cations_cof` | COF–Cs, COF–Sr, and COF–La EDD calculations; reference COF geometry optimization |
 | `edd_anions_cof` | COF–Cl and COF–SO4 EDD calculations |
 
-## Quantum chemical calculations and parameterization
-
-The initial periodic HBAB–TAPA–COF unit-cell geometry was optimized using CASTEP with the GGA-PBE functional. Atomic partial charges of the periodic framework were derived using the REPEAT method in CP2K.
-
-PSSNa partial charges were assigned using the RESP method. The electrostatic potential was calculated at the B3LYP/6-311G** level with an implicit aqueous solvent model and analyzed using Multiwfn.
-
 ## Umbrella sampling and PMF reconstruction
 
 Umbrella sampling was performed using the LAMMPS Colvars interface. The reaction coordinate is the z-position of the selected molecule or ion relative to a fixed reference at z = 0. Harmonic restraint centers are spaced by 1 Å (0.1 nm).
