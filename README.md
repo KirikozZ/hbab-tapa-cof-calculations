@@ -62,7 +62,7 @@ The electron density difference is defined as:
 Delta rho(r) = rho_complex(r) - rho_cof(r) - rho_ion(r)
 ```
 
-The electron-density CUBE files were processed using Multiwfn. Electron accumulation and depletion are displayed using different colors; the Cs, Sr.
+The electron-density CUBE files were processed using Multiwfn. Electron accumulation and depletion are displayed using different colors.
 
 ### Calculation structure
 
